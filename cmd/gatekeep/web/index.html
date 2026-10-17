@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GateKeep Demo</title>
+<meta name="description" content="Live demo of an OIDC identity provider and token-validating reverse proxy written in Go.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>GateKeep</h1>
+    <p>An OpenID Connect identity provider and an authenticating reverse proxy, written in Go with only the standard library. This page is a real OIDC client: it signs in with the authorization code flow and PKCE, then calls a backend that sits behind the proxy.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="card" id="signin">
+    <h2><span class="step">1</span> Sign in</h2>
+    <div id="signed-out">
+      <p>Use one of the demo accounts:</p>
+      <table class="accounts">
+        <thead><tr><th>Username</th><th>Password</th><th>Roles</th></tr></thead>
+        <tbody>
+          <tr><td><code>alice</code></td><td><code>alice-demo-pass</code></td><td>user</td></tr>
+          <tr><td><code>bob</code></td><td><code>bob-demo-pass</code></td><td>user, admin</td></tr>
+        </tbody>
+      </table>
+      <button id="login" class="primary">Sign in with GateKeep</button>
+    </div>
+    <div id="signed-in" hidden>
+      <p class="who">Signed in as <b id="who-name"></b> · roles <b id="who-roles"></b></p>
+      <p class="muted">Access token expires in <b id="ttl">–</b> · signing key <code id="kid"></code></p>
+      <details>
+        <summary>Show decoded access token</summary>
+        <pre id="claims"></pre>
+      </details>
+      <button id="logout">Sign out</button>
+    </div>
+  </section>
+
+  <section class="card" id="api" hidden>
+    <h2><span class="step">2</span> Call the backend through the proxy</h2>
+    <div class="buttons">
+      <button data-call="hello">GET /api/hello</button>
+      <button data-call="admin">GET /api/admin <span class="hint">(admin only)</span></button>
+      <button data-call="none">No token</button>
+      <button data-call="tamper">Tampered token</button>
+      <button data-call="algnone">alg: none token</button>
+      <button data-call="spoof">Spoof X-Auth-User: bob</button>
+    </div>
+  </section>
+
+  <section class="card" id="life" hidden>
+    <h2><span class="step">3</span> Token lifecycle</h2>
+    <div class="buttons">
+      <button id="refresh">Refresh tokens</button>
+      <button id="replay">Replay the old refresh token</button>
+      <button id="rotate">Rotate signing key</button>
+      <button id="revoke">Revoke access token</button>
+    </div>
+    <p class="muted">Refresh tokens rotate on every use. Replaying an old one looks like theft, so the whole session is revoked. After a key rotation, old tokens keep working until they expire, because the old public key stays in the JWKS for a grace period.</p>
+  </section>
+
+  <section class="card">
+    <h2>Activity</h2>
+    <ol id="log" aria-live="polite"></ol>
+    <p id="empty" class="muted">Responses from the proxy and the identity provider show up here.</p>
+  </section>
+</main>
+
+<footer class="wrap muted">
+  Endpoints: <a href="idp/.well-known/openid-configuration">discovery</a> · <a href="idp/jwks.json">JWKS</a> · <a href="api/health">/api/health</a> (public)
+</footer>
+<script src="app.js"></script>
+</body>
+</html>

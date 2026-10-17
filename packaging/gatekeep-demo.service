@@ -1,0 +1,16 @@
+[Unit]
+Description=GateKeep demo (identity provider + authenticating proxy)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/gatekeep demo -addr 127.0.0.1:8080
+DynamicUser=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
